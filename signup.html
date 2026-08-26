@@ -15,7 +15,8 @@
 
   <section class="auth-section">
     <div class="container">
-      <div class="auth-card">
+      <!-- Signup Form -->
+      <div id="signup-card" class="auth-card">
         <h1>Create account</h1>
         <p class="subtitle">Start generating AI prompts based on real market trends.</p>
 
@@ -26,7 +27,13 @@
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Min. 6 characters" required minlength="6">
+            <div class="password-wrapper">
+              <input type="password" id="password" name="password" placeholder="Min. 6 characters" required minlength="6">
+              <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
+                <svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
           </div>
           <button type="submit" class="btn btn-primary" id="submit-btn">
             <span id="btn-text">Sign up</span>
@@ -38,6 +45,16 @@
 
         <p class="auth-link">Already have an account? <a href="/login">Log in</a></p>
       </div>
+
+      <!-- Confirmation Message -->
+      <div id="confirmation" class="auth-card hidden">
+        <div class="success-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h1>Check your email</h1>
+        <p class="subtitle">We sent a confirmation link to <strong id="confirm-email"></strong>. Click the link to activate your account.</p>
+        <p class="auth-link"><a href="/login">Back to login</a></p>
+      </div>
     </div>
   </section>
 
@@ -47,6 +64,21 @@
     const submitBtn = document.getElementById("submit-btn");
     const btnText = document.getElementById("btn-text");
     const btnLoading = document.getElementById("btn-loading");
+
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const eyeOpen = btn.querySelector(".eye-open");
+      const eyeClosed = btn.querySelector(".eye-closed");
+      if (input.type === "password") {
+        input.type = "text";
+        eyeOpen.classList.add("hidden");
+        eyeClosed.classList.remove("hidden");
+      } else {
+        input.type = "password";
+        eyeOpen.classList.remove("hidden");
+        eyeClosed.classList.add("hidden");
+      }
+    }
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -73,9 +105,10 @@
           return;
         }
 
-        localStorage.setItem("sb-access-token", data.access_token);
-        localStorage.setItem("sb-user-id", data.user_id);
-        window.location.href = "/dashboard";
+        // Show confirmation message
+        document.getElementById("confirm-email").textContent = email;
+        document.getElementById("signup-card").classList.add("hidden");
+        document.getElementById("confirmation").classList.remove("hidden");
       } catch (err) {
         errorDiv.textContent = "Network error. Please try again.";
         errorDiv.classList.remove("hidden");
