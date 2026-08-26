@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from src.auth import User, get_current_user
-from src.database import get_supabase
+from src.database import get_supabase, get_supabase_for_user
 from src.prompt_writer.engine import generate_prompts
 from src.prompt_writer.formatter import format_report
 from src.trend_hunter.orchestrator import run_trend_hunt
@@ -156,7 +156,7 @@ async def save_api_key(
     Returns:
         Success message.
     """
-    supabase = get_supabase()
+    supabase = get_supabase_for_user(user.access_token)
 
     # Upsert: try update first, insert if not exists
     existing = supabase.table("user_api_keys").select("id").eq("user_id", user.id).execute()
@@ -183,7 +183,7 @@ async def get_api_key(user: User = Depends(get_current_user)) -> dict[str, str]:
     Returns:
         The stored API key (or empty string if not set).
     """
-    supabase = get_supabase()
+    supabase = get_supabase_for_user(user.access_token)
     result = supabase.table("user_api_keys").select("api_key").eq("user_id", user.id).execute()
 
     data: Any = result.data
@@ -210,7 +210,7 @@ async def generate_report(niche: str, user: User = Depends(get_current_user)) ->
         Report with generated prompts in markdown format.
     """
     # Fetch user's stored API key
-    supabase = get_supabase()
+    supabase = get_supabase_for_user(user.access_token)
     result = supabase.table("user_api_keys").select("api_key").eq("user_id", user.id).execute()
 
     data: Any = result.data

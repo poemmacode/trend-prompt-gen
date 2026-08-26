@@ -8,10 +8,10 @@ _supabase_client: Client | None = None
 
 
 def get_supabase() -> Client:
-    """Get or create Supabase client singleton.
+    """Get or create Supabase client singleton (service role).
 
     Returns:
-        Configured Supabase client.
+        Configured Supabase client with service role key.
 
     Raises:
         ValueError: If SUPABASE_URL or SUPABASE_SERVICE_KEY are not set.
@@ -31,10 +31,15 @@ def get_supabase() -> Client:
     return _supabase_client
 
 
-def get_supabase_anon() -> Client:
-    """Get Supabase client with anon key (for public operations).
+def get_supabase_for_user(access_token: str) -> Client:
+    """Create a Supabase client with user's access token (for RLS).
+
+    Args:
+        access_token: The user's Supabase access token.
 
     Returns:
-        Supabase client with anon key.
+        Supabase client authenticated as the user.
     """
-    return create_client(settings.supabase_url, settings.supabase_anon_key)
+    client = create_client(settings.supabase_url, settings.supabase_anon_key)
+    client.auth.set_session(access_token=access_token)
+    return client
