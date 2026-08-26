@@ -9,6 +9,12 @@ app = FastAPI(
 )
 
 
+@app.get("/")
+def root() -> dict[str, str]:
+    """Root endpoint."""
+    return {"message": "TrendPrompt Engine API", "docs": "/docs"}
+
+
 @app.get("/health")
 def health_check() -> dict[str, str]:
     """Health check endpoint."""
