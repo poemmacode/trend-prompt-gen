@@ -53,8 +53,7 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
-    const report = formatReport(data);
-    reportContent.textContent = report;
+    reportContent.textContent = data.report;
     results.classList.remove("hidden");
   } catch (err) {
     showError("Network error. Please try again.");
@@ -72,10 +71,3 @@ copyBtn.addEventListener("click", () => {
     }, 2000);
   });
 });
-
-function formatReport(data) {
-  let report = `## ${data.niche}\n\n`;
-  report += `**Status:** ${data.status}\n\n`;
-  report += `${data.message}\n`;
-  return report;
-}

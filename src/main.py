@@ -7,6 +7,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.auth import get_api_key
+from src.prompt_writer.engine import generate_prompts
+from src.prompt_writer.formatter import format_report
+from src.trend_hunter.models import Trend
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -37,17 +40,33 @@ def health_check() -> dict[str, str]:
 async def generate_report(niche: str, api_key: str = Depends(get_api_key)) -> dict[str, str]:
     """Generate a trend report for the given niche.
 
+    Uses the user's OpenAI API key to generate prompts via GPT-4o-mini.
+
     Args:
         niche: The market niche to analyze.
         api_key: User's OpenAI API key (from Authorization header).
 
     Returns:
-        Report data with trends and prompts.
+        Report with generated prompts in markdown format.
     """
-    # TODO: Implement actual trend hunting and prompt generation
-    # For now, return a placeholder showing the key was accepted
+    # Placeholder trends — will be replaced by real scrapers (features 003-006)
+    trends = [
+        Trend(
+            title=f"Rising interest in {niche}",
+            description=f"Current trending topics and products in the {niche} market",
+            source="Trend Analysis",
+        ),
+    ]
+
+    all_prompts = []
+    for trend in trends:
+        prompts = await generate_prompts(trend, api_key)
+        all_prompts.extend(prompts)
+
+    report = format_report(niche, all_prompts)
+
     return {
         "niche": niche,
-        "status": "received",
-        "message": f"API key accepted. Trend hunting for '{niche}' will be implemented in future features.",
+        "status": "success",
+        "report": report,
     }
