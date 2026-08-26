@@ -11,11 +11,16 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str = ""
 
-    # Supabase
+    # Supabase (supports both naming conventions)
     supabase_url: str = ""
     supabase_anon_key: str = ""
     supabase_service_key: str = ""
     supabase_jwt_secret: str = ""
+
+    @property
+    def supabase_key(self) -> str:
+        """Get the Supabase service key (for admin operations)."""
+        return self.supabase_service_key
 
     # Scraping (future)
     etsy_api_key: str = ""
