@@ -12,7 +12,7 @@ from src.auth import User, get_current_user
 from src.database import get_supabase
 from src.prompt_writer.engine import generate_prompts
 from src.prompt_writer.formatter import format_report
-from src.trend_hunter.models import Trend
+from src.trend_hunter.orchestrator import run_trend_hunt
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -219,17 +219,11 @@ async def generate_report(niche: str, user: User = Depends(get_current_user)) ->
 
     api_key: str = data[0]["api_key"]
 
-    # Placeholder trends — will be replaced by real scrapers (features 003-006)
-    trends = [
-        Trend(
-            title=f"Rising interest in {niche}",
-            description=f"Current trending topics and products in the {niche} market",
-            source="Trend Analysis",
-        ),
-    ]
+    # Collect real trends from scrapers
+    trend_report = run_trend_hunt(niche)
 
     all_prompts = []
-    for trend in trends:
+    for trend in trend_report.trends:
         prompts = await generate_prompts(trend, api_key)
         all_prompts.extend(prompts)
 
