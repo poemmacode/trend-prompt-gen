@@ -1,6 +1,7 @@
 """FastAPI application entrypoint."""
 
 from pathlib import Path
+from typing import Any
 
 from fastapi import Depends, FastAPI
 from fastapi.responses import FileResponse
@@ -185,8 +186,10 @@ async def get_api_key(user: User = Depends(get_current_user)) -> dict[str, str]:
     supabase = get_supabase()
     result = supabase.table("user_api_keys").select("api_key").eq("user_id", user.id).execute()
 
-    if result.data:
-        return {"api_key": result.data[0]["api_key"]}
+    data: list[dict[str, Any]] = result.data
+    if data:
+        api_key_value: str = data[0].get("api_key", "")
+        return {"api_key": api_key_value}
     return {"api_key": ""}
 
 
@@ -210,10 +213,11 @@ async def generate_report(niche: str, user: User = Depends(get_current_user)) ->
     supabase = get_supabase()
     result = supabase.table("user_api_keys").select("api_key").eq("user_id", user.id).execute()
 
-    if not result.data or not result.data[0].get("api_key"):
+    data: list[dict[str, Any]] = result.data
+    if not data or not data[0].get("api_key"):
         return {"error": "No API key saved. Please add your OpenAI API key in settings."}
 
-    api_key = result.data[0]["api_key"]
+    api_key: str = data[0]["api_key"]
 
     # Placeholder trends — will be replaced by real scrapers (features 003-006)
     trends = [
