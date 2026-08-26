@@ -29,17 +29,3 @@ def get_supabase() -> Client:
     if _supabase_client is None:
         _supabase_client = create_client(settings.supabase_url, settings.supabase_service_key)
     return _supabase_client
-
-
-def get_supabase_for_user(access_token: str) -> Client:
-    """Create a Supabase client with user's access token (for RLS).
-
-    Args:
-        access_token: The user's Supabase access token.
-
-    Returns:
-        Supabase client authenticated as the user.
-    """
-    client = create_client(settings.supabase_url, settings.supabase_anon_key)
-    client.auth.set_session(access_token=access_token)
-    return client

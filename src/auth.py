@@ -14,7 +14,6 @@ class User:
 
     id: str
     email: str
-    access_token: str
 
 
 async def get_current_user(authorization: str | None = Header(default=None)) -> User:
@@ -24,7 +23,7 @@ async def get_current_user(authorization: str | None = Header(default=None)) -> 
         authorization: The Authorization header value.
 
     Returns:
-        Authenticated User object with access token.
+        Authenticated User object.
 
     Raises:
         HTTPException: If no token, invalid format, or verification fails.
@@ -58,4 +57,4 @@ async def get_current_user(authorization: str | None = Header(default=None)) -> 
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid token payload.")
 
-    return User(id=user_id, email=email, access_token=token)
+    return User(id=user_id, email=email)
